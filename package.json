@@ -1,0 +1,24 @@
+{
+  "name": "api-labs",
+  "version": "1.0.0",
+  "description": "Lab work for Enterprise Web Development, MSc in Enterprise Web Development.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ASimpleMeow/ewd-api-labs-2020.git"
+  },
+  "author": "Oleksandr Kononov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ASimpleMeow/ewd-api-labs-2020/issues"
+  },
+  "homepage": "https://github.com/ASimpleMeow/ewd-api-labs-2020#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "nodemon": "^2.0.2"
+  }
+}
