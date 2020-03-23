@@ -4,7 +4,8 @@
   "description": "Lab work for Enterprise Web Development, MSc in Enterprise Web Development.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --exec babel-node index.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,8 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "nodemon": "^2.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0"
   }
 }
