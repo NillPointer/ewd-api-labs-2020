@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import moviesRouter from './api/movies';
 import genresRouter from './api/genres';
+import actorRouter from './api/actor';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
@@ -39,8 +40,9 @@ app.use(session({
   saveUninitialized: true
 }));
 
-app.use('/api/movies', authenticate, postsRouter);
+app.use('/api/movies', moviesRouter);
 app.use('/api/genres', genresRouter);
+app.use('/api/actor', actorRouter)
 app.use('/api/users', usersRouter);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
