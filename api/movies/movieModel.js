@@ -37,9 +37,13 @@ tagline : { type: String}
 
   });
 
-  MovieSchema.statics.findByMovieDBId = id => {
+MovieSchema.statics.findByMovieDBId = id => {
     return this.findOne({ id: id});
   };
+
+MovieSchema.statics.findMovieReviews = id => {
+  return this.findByMovieDBId(id).then(movie => {return {id: movie.id, results: movie.reviews}});
+}
 
 
 export default mongoose.model('Movie', MovieSchema);

@@ -10,7 +10,7 @@ import './db';
 import {loadUsers, removeFavourites} from './seedData';
 import usersRouter from './api/users';
 import session from 'express-session';
-import authenticate from './authenticate';
+import passport from './authenticate';
 
 dotenv.config();
 
@@ -28,19 +28,22 @@ if (process.env.seedDb) {
   removeFavourites();
 }
 
-//configure body-parser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-
-app.use(express.static('public'));
-
 app.use(session({
   secret: 'ilikecake',
   resave: true,
   saveUninitialized: true
 }));
 
-app.use('/api/movies', moviesRouter);
+// initialise passport
+app.use(passport.initialize());
+
+//configure body-parser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+
+app.use(express.static('public'));
+
+app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
 app.use('/api/genres', genresRouter);
 app.use('/api/actor', actorRouter)
 app.use('/api/users', usersRouter);

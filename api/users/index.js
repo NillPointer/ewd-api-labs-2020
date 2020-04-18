@@ -1,5 +1,6 @@
 import express from 'express';
 import User from './userModel';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router(); // eslint-disable-line
 
@@ -15,26 +16,44 @@ router.get('/:userName/favourites', (req, res) => {
     )
 });
 
-// authenticate a user
-router.post('/', (req, res) => {
+// Register/login a user
+router.post('/', (req, res, next) => {
     if (!req.body.username || !req.body.password) {
-        res.status(401).send('authentication failed');
-    } else {
-        User.findByUserName(req.body.username).then(user => {
-            if (user.comparePassword(req.body.password)) {
-                req.session.user = req.body.username;
-                req.session.authenticated = true;
-                res.status(200).json({
-                    success: true,
-                    token: "temporary-token"
-                  });
-            } else {
-                res.status(401).json('authentication failed');
-            }
+        res.json({
+            success: false,
+            msg: 'Please pass username and password',
         });
     }
-  
-  });
+    if (req.query.action === 'register') {
+        User.create({
+            username: req.body.username,
+            password: req.body.password,
+        }).then(user => res.status(201).json({
+            code: 201,
+            msg: 'Successfully created new user',
+        })).catch(next);
+    } else {
+        User.findByUserName(req.body.username).then(user => {
+            if (!user) return res.status(401).send({code: 401, msg: 'Authentication failed. User not found.'});
+            user.comparePassword(req.body.password, (err, isMatch) => {
+                if (isMatch && !err) {
+                    // If user is found and password matches create a token
+                    const token = jwt.sign(user.username, process.env.secret);
+                    // Return the information including token as JSON
+                    res.status(200).json({
+                        success: true,
+                        token: 'BEARER '+token,
+                    });
+                } else {
+                    res.status(401).send({
+                        code: 401,
+                        msg: 'Authentication failed. Wrong password'
+                    });
+                }
+            })
+        }).catch(next);
+    }
+});
 
 router.post('/:userName/favourites', (req, res, next) => {
     const newFavourite = req.body;
