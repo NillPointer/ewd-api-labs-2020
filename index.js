@@ -7,25 +7,19 @@ import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import './db';
-import {loadUsers, removeFavourites} from './seedData';
 import usersRouter from './api/users';
 import session from 'express-session';
 import passport from './authenticate';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const port = process.env.PORT;
 const swaggerDocument = YAML.load('./movie-api-yaml/swagger.yaml');
 
 const errorHandler=(err,req,res,next)=>{
   console.log(err);
   res.status(500).json({status: 500, message:"Internal Server Error"});
-}
-
-if (process.env.seedDb) {
-  loadUsers();
-  removeFavourites();
 }
 
 app.use(session({

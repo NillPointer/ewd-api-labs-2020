@@ -5,15 +5,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec babel-node index.js"
+    "start": "cross-env NODE_ENV=development nodemon --exec babel-node index.js",
+    "unit-test": "cross-env NODE_ENV=test mocha ./api/**/tests/*.js --require babel-core/register --require babel-polyfill --exit",
+    "test": "cross-env NODE_ENV=test mocha ./tests/*.js --timeout 120000 --require babel-core/register --require babel-polyfill --reporter mochawesome --exit"
   },
   "author": "Oleksandr Kononov",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "nodemon": "^2.0.2"
+    "cross-env": "^7.0.2",
+    "mocha": "^7.1.1",
+    "mochawesome": "^6.1.0",
+    "mockgoose": "^8.0.4",
+    "nodemon": "^2.0.2",
+    "should": "^13.2.3",
+    "sinon": "^9.0.2",
+    "sinon-test": "^3.0.0",
+    "supertest": "^4.0.2"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
