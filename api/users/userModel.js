@@ -7,7 +7,7 @@ const UserSchema = new Schema({
   username: { type: String, unique: true, required: true},
   password: {type: String, required: true },
   favourites: [{type: mongoose.Schema.Types.ObjectId,
-              ref: 'Movie'  }]
+              ref: 'Movie', default: []  }]
 });
 
 UserSchema.pre('save', function(next) {

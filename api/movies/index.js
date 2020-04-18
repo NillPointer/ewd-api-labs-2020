@@ -16,18 +16,18 @@ router.get('/:id', (req, res) => {
   getMovie(id).then(movie => res.status(200).send(movie));
 });
 
-router.get('/:id/reviews', (req, res) => {
+router.get('/:id/reviews', (req, res, next) => {
   const id = parseInt(req.params.id);
-  Movie.findByMovieDBId(id).then(movie => res.status(200).send(movie.reviews));
+  Movie.findMovieReviews(id)
+  .then(results => res.status(200).send(results))
 });
 
 router.post('/:id/reviews', (req, res) => {
   const id = parseInt(req.params.id);
   Movie.findByMovieDBId(id).then(movie => {
-    movie.reviews.push(req.body);
-    movie.save().then(res.status(200).send(movie.reviews));
-  })
-})
+    movie.reviews.push(req.body)
+    movie.save().then(res.status(200).send(movie.reviews))});
+});
 
 router.get('/:id/credits', (req, res) => {
   const id = parseInt(req.params.id);

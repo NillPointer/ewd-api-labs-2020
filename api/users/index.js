@@ -1,5 +1,6 @@
 import express from 'express';
 import User from './userModel';
+import Movie from '../movies/movieModel';
 import jwt from 'jsonwebtoken';
 
 const router = express.Router(); // eslint-disable-line
@@ -55,7 +56,7 @@ router.post('/', (req, res, next) => {
     }
 });
 
-router.post('/:userName/favourites', (req, res, next) => {
+router.post('/:userName/favourites', (req, res) => {
     const newFavourite = req.body;
     const userName = req.params.userName;
     if (newFavourite && newFavourite.id) {

@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const MovieReviewSchema = {
-  userName : { type: String},
-  review : {type: String}
+  author : { type: String},
+  content : {type: String}
 }
 
 const MovieSchema = new Schema({
@@ -13,6 +13,7 @@ const MovieSchema = new Schema({
     poster_path: { type: String},
     overview: { type: String},
     release_date: { type: String},
+    reviews : [ MovieReviewSchema],
     original_title: { type: String},
     genre_ids: [{type: Number}],
     original_language: { type: String},
@@ -26,7 +27,6 @@ const MovieSchema = new Schema({
         iso_3166_1 : { type: String},
         name : { type: String}
       } ],
-    reviews : [ MovieReviewSchema],
       runtime : {type:Number},
 spoken_languages : [ {
   iso_639_1 : { type: String},
@@ -37,13 +37,14 @@ tagline : { type: String}
 
   });
 
-MovieSchema.statics.findByMovieDBId = id => {
-    return this.findOne({ id: id});
+  MovieSchema.statics.findByMovieDBId = function (id) {
+    return this.findOne({ id: id})
+  }
+  
+  MovieSchema.statics.findMovieReviews = function(id) {
+      return this.findByMovieDBId(id)
+      .then(movie => {return {id:movie.id, results: movie.reviews}})
   };
-
-MovieSchema.statics.findMovieReviews = id => {
-  return this.findByMovieDBId(id).then(movie => {return {id: movie.id, results: movie.reviews}});
-}
 
 
 export default mongoose.model('Movie', MovieSchema);
