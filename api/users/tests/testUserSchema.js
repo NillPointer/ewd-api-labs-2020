@@ -2,6 +2,7 @@ import should from 'should';
 import sinon from 'sinon';
 import sinonTestFactory from 'sinon-test';
 import userModel from '../userModel';
+import mongoose from 'mongoose';
 
 const sinonTest = sinonTestFactory(sinon);
 
@@ -70,4 +71,14 @@ describe('userModelTests', () => {
         })
     });
 
+    it('should be able to store favourite movies', done => {
+        const m = new userModel(testUser);
+        m.favourites.should.have.lengthOf(0);
+        m.favourites.push(mongoose.Schema.Types.ObjectId(1));
+        m.validate(err => {
+            should.not.exist(err);
+            m.favourites.should.have.lengthOf(1);
+        })
+        done();
+    })
 })
