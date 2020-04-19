@@ -61,12 +61,13 @@ describe('userModelTests', () => {
         }
 
         const m1 = new userModel(user1);
-        const m1 = new userModel(user2);
+        const m2 = new userModel(user2);
 
         m1.comparePassword(m2.password, (err, res) => {
             should.not.exist(err);
             res.should.be.true;
             done();
         })
-    })
+    });
+
 })

@@ -10,13 +10,6 @@ router.get('/', (req, res) => {
     User.find().then(users =>  res.status(200).json(users));
 });
 
-router.get('/:userName/favourites', (req, res) => {
-    const userName = req.params.userName;
-    User.findByUserName(userName).populate('favourites').then(
-        user => res.status(201).send(user.favourites)
-    )
-});
-
 // Register/login a user
 router.post('/', (req, res, next) => {
     if (!req.body.username || !req.body.password) {
@@ -56,6 +49,27 @@ router.post('/', (req, res, next) => {
     }
 });
 
+// Update a user
+router.put('/:id',  (req, res, next) => {
+    if (req.body._id) delete req.body._id;
+     User.update({
+      _id: req.params.id,
+    }, req.body, {
+      upsert: false,
+    })
+    .then(user => res.json(200, user));
+    next()
+});
+
+// Get user favourites
+router.get('/:userName/favourites', (req, res) => {
+    const userName = req.params.userName;
+    User.findByUserName(userName).populate('favourites').then(
+        user => res.status(201).send(user.favourites)
+    )
+});
+
+// Add user favourites
 router.post('/:userName/favourites', (req, res) => {
     const newFavourite = req.body;
     const userName = req.params.userName;
@@ -71,17 +85,17 @@ router.post('/:userName/favourites', (req, res) => {
     } else {
         res.status(401).send("unable")
     }
-  });
-
-// Update a user
-router.put('/:id',  (req, res, next) => {
-    if (req.body._id) delete req.body._id;
-     User.update({
-      _id: req.params.id,
-    }, req.body, {
-      upsert: false,
-    })
-    .then(user => res.json(200, user));
-    next()
 });
+
+  // Delete user favourites
+router.delete('/:userName/favourites/:movieId', (req, res) => {
+    const userName = req.params.userName;
+    const movieId = req.params.movieId;
+    User.findByUserName(userName).then(user => {
+        const favIndex = user.favourites.indexOf(movieId);
+        favIndex > -1 ? user.favourites.splice(favIndex, 1) : user;
+        user.save().then(user => res.status(201).send(user));
+    }).catch(err => console.log(err));
+});
+
 export default router;
