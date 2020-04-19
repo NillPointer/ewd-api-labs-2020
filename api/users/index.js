@@ -49,7 +49,7 @@ router.post('/', (req, res, next) => {
     }
 });
 
-// Update a user
+// Update a user (only password and favourites)
 router.put('/:userName',  (req, res, next) => {
     const userName = req.params.userName;
     if (req.body._id) delete req.body._id;
@@ -64,37 +64,40 @@ router.put('/:userName',  (req, res, next) => {
 router.get('/:userName/favourites', (req, res) => {
     const userName = req.params.userName;
     User.findByUserName(userName).populate('favourites').then(
-        user => res.status(201).send(user.favourites)
+        user => res.status(200).send(user.favourites)
     )
 });
 
 // Add user favourites
-router.post('/:userName/favourites', (req, res) => {
+router.post('/:userName/favourites', (req, res, next) => {
     const newFavourite = req.body;
     const userName = req.params.userName;
     if (newFavourite && newFavourite.id) {
-        Movie.findOneAndUpdate({id: newFavourite.id},newFavourite,{new:true,upsert:true}).then(movie => {
+        Movie.findOneAndUpdate({id: newFavourite.id},newFavourite,{new:true,upsert:false}).then(movie => {
+            if (!movie) return res.status(500).send({error: "No such movie found"});
             User.findByUserName(userName).then(
                     (user) => { 
                        (user.favourites.indexOf(movie._id)>-1)?user:user.favourites.push(movie._id.toString());
                        user.save().then(user => res.status(201).send(user))
                       }
             );
-            }).catch((err) => console.log(err));
+        }).catch(next);
     } else {
         res.status(401).send("unable")
     }
 });
 
   // Delete user favourites
-router.delete('/:userName/favourites/:movieId', (req, res) => {
+router.delete('/:userName/favourites/:movieId', (req, res, next) => {
     const userName = req.params.userName;
     const movieId = req.params.movieId;
-    User.findByUserName(userName).then(user => {
-        const favIndex = user.favourites.indexOf(movieId);
-        favIndex > -1 ? user.favourites.splice(favIndex, 1) : user;
-        user.save().then(user => res.status(201).send(user));
-    }).catch(err => console.log(err));
+    Movie.findByMovieDBId(movieId).then(movie => {
+        User.findByUserName(userName).then(user => {
+            const favIndex = user.favourites.indexOf(movie._id);
+            favIndex > -1 ? user.favourites.splice(favIndex, 1) : user;
+            user.save().then(user => res.status(200).send(user));
+        }).catch(next);
+    }).catch(next);
 });
 
 export default router;

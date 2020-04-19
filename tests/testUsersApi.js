@@ -18,6 +18,8 @@ describe('Users API test', function () {
         testUser.password = 'test2';
         invalidUser.username = 'chancer1';
         invalidUser.password = 'bad1';
+        movieModel.create({id: 1, title: "A"})
+        movieModel.create({id: 2, title: "B"})
         userModel.create(testUser).then(res => done()).catch(err => done(err));
     });
 
@@ -97,6 +99,90 @@ describe('Users API test', function () {
             res.should.have.property('status').equal(401);
             should.not.exist(res.body.token);
             done();
+        }).catch(err => done(err));
+    });
+
+    it('should get all favourites of a user', done => {
+        supertest(app)
+        .get(`/api/users/${testUser.username}/favourites`)
+        .expect('Content-type', /json/)
+        .expect(200)
+        .then(res => {
+            res.should.have.property('status').equal(200);
+            res.body.should.be.Array;
+            res.body.should.have.lengthOf(0);
+            done();
+        }).catch(err => done(err));
+    });
+
+    it('should add favourties to user', done => {
+        const currentFavs = testUser.favourites.length;
+        supertest(app)
+        .post(`/api/users/${testUser.username}/favourites`)
+        .send({id: 1})
+        .expect('Content-type', /json/)
+        .expect(201)
+        .then(res => {
+            res.should.have.property('status').equal(201);
+            res.body.should.have.property('favourites');
+            res.body.favourites.should.be.Array;
+            res.body.favourites.should.not.have.lengthOf(0);
+            res.body.favourites.should.not.have.lengthOf(currentFavs);
+            done();
+        }).catch(err => done(err));
+    });
+
+    it('should not add invalid favourties to user', done => {
+        const currentFavs = testUser.favourites.length;
+        supertest(app)
+        .post(`/api/users/${testUser.username}/favourites`)
+        .send({wrongKeyId: 1})
+        .expect(401)
+        .then(res => {
+            res.should.have.property('status').equal(401);
+            done();
+        }).catch(err => done(err));
+    });
+
+    it('should not add nonexistant favourties to user', done => {
+        const currentFavs = testUser.favourites.length;
+        supertest(app)
+        .post(`/api/users/${testUser.username}/favourites`)
+        .send({id: -1})
+        .expect('Content-type', /json/)
+        .expect(500)
+        .then(res => {
+            res.should.have.property('status').equal(500);
+            done();
+        }).catch(err => done(err));
+    });
+
+    it('should be able to delete favourites', done => {
+        let currentFavs = testUser.favourites.length;
+        supertest(app)
+        .post(`/api/users/${testUser.username}/favourites`)
+        .send({id: 2})
+        .expect('Content-type', /json/)
+        .expect(201)
+        .then(res => {
+            res.should.have.property('status').equal(201);
+            res.body.should.have.property('favourites');
+            res.body.favourites.should.be.Array;
+            res.body.favourites.should.not.have.lengthOf(0);
+            res.body.favourites.should.not.have.lengthOf(currentFavs);
+            currentFavs = res.body.favourites.length;
+            supertest(app)
+            .delete(`/api/users/${testUser.username}/favourites/2`)
+            .expect('Content-type', /json/)
+            .expect(200)
+            .then(res => {
+                res.should.have.property('status').equal(200);
+                res.body.should.have.property('favourites');
+                res.body.favourites.should.be.Array;
+                res.body.favourites.should.not.have.lengthOf(0);
+                res.body.favourites.should.not.have.lengthOf(currentFavs);
+                done();
+            }).catch(err => done(err))
         }).catch(err => done(err));
     });
 });
