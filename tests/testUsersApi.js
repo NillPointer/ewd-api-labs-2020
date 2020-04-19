@@ -4,6 +4,7 @@ import {
 } from '../index.js';
 import should from 'should';
 import userModel from '../api/users/userModel';
+import movieModel from '../api/movies/movieModel';
 
 const testUser = {};
 const invalidUser = {};
@@ -18,9 +19,38 @@ describe('Users API test', function () {
         invalidUser.username = 'chancer1';
         invalidUser.password = 'bad1';
         userModel.create(testUser).then(res => done()).catch(err => done(err));
-    })
+    });
 
-    // test #1: Register a User
+    it('should get all users', (done) => {
+        supertest(app)
+        .get('/api/users')
+        .expect('Content-type', /json/)
+        .expect(200)
+        .then(res => {
+            res.should.have.property('status').equal(200);
+            res.body.should.be.Array;
+            res.body.should.have.lengthOf(2);
+            res.body[0].username.should.equal('user1');
+            res.body[1].username.should.equal('user2');
+            done();
+        }).catch(err => done(err));
+    });
+
+    it('should update a user', done => {
+        testUser.favourites = ["5e9c45fae29fa52c55ddae8c"]
+        supertest(app)
+        .put(`/api/users/${testUser.username}`)
+        .send(testUser)
+        .expect('Content-type', /json/)
+        .expect(200)
+        .then(res => {
+            res.should.have.property('status').equal(200);
+            res.body.should.have.property('favourites');
+            res.body.favourites.should.have.lengthOf(1);
+            done();
+        }).catch(done);
+    });
+
     it('should register a user', (done) => {
 
         const newUser = {

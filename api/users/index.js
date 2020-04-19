@@ -50,15 +50,14 @@ router.post('/', (req, res, next) => {
 });
 
 // Update a user
-router.put('/:id',  (req, res, next) => {
+router.put('/:userName',  (req, res, next) => {
+    const userName = req.params.userName;
     if (req.body._id) delete req.body._id;
-     User.update({
-      _id: req.params.id,
-    }, req.body, {
-      upsert: false,
-    })
-    .then(user => res.json(200, user));
-    next()
+    User.findByUserName(userName).then(user => {
+        user.password = req.body.password;
+        user.favourites = req.body.favourites;
+        return user.save().then(user => res.status(200).send(user)).catch(next);
+    }).catch(next);
 });
 
 // Get user favourites
