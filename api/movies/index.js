@@ -16,22 +16,27 @@ router.get('/:id', (req, res) => {
   getMovie(id).then(movie => res.status(200).send(movie));
 });
 
-router.get('/:id/reviews', (req, res, next) => {
+router.get('/:id/reviews', (req, res) => {
   const id = parseInt(req.params.id);
   Movie.findMovieReviews(id)
-  .then(results => res.status(200).send(results))
+  .then(results => results ? res.status(200).send(results) : res.status(500).send(null))
 });
 
 router.post('/:id/reviews', (req, res) => {
   const id = parseInt(req.params.id);
   Movie.findByMovieDBId(id).then(movie => {
-    movie.reviews.push(req.body)
-    movie.save().then(res.status(200).send(movie.reviews))});
+    if (!movie){
+      res.status(500).send(null);
+    } else {
+      movie.reviews.push(req.body)
+      movie.save().then(res.status(200).send(movie.reviews))
+    }
+  });
 });
 
 router.get('/:id/credits', (req, res) => {
   const id = parseInt(req.params.id);
-  getMovieCredits(id).then(credits => res.status(200).send(credits));
+  getMovieCredits(id).then(credits => credits ? res.status(200).send(credits) : res.status(500).send(null));
 });
 
 

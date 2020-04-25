@@ -43,7 +43,9 @@ MovieSchema.statics.findByMovieDBId = function (id) {
   
 MovieSchema.statics.findMovieReviews = function(id) {
   return this.findByMovieDBId(id)
-  .then(movie => {return {id:movie.id, results: movie.reviews}})
+  .then(movie => {
+    return movie ? {id:movie.id, results: movie.reviews} : null
+  })
 };
 
 
